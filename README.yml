@@ -15,32 +15,23 @@ slack: https://correia-group.slack.com/
 blueprint: docker/image
 
 overview: |
-  Docker Base image
+  Docker NodeJS Base image
 
 dockerfiles:
   - Dockerfile
 
 usage: |
   ```bash
-  $ docker run --rm marcelocorreia/base:alpine bash
-  $ docker run --rm marcelocorreia/base:jessie-slim bash
-  $ docker run --rm marcelocorreia/base:buster-slim bash
+  $ docker run --rm marcelocorreia/base-node node -v
+
   ```
   ## Setting timezone
   ```bash
-  $ docker run --rm -e TZ=Australia/Sydney marcelocorreia/base bash
+  $ docker run --rm -e TZ=Australia/Sydney marcelocorreia/base-node node -v
   ```
   ### Extending
   ```Dockerfile
-  FROM marcelocorreia/base:alpine
-  ...
-  ```
-  ```Dockerfile
-  FROM marcelocorreia/base:jessie-slim
-  ...
-  ```
-  ```Dockerfile
-  FROM marcelocorreia/base:buster-slim
+  FROM marcelocorreia/base-node
   ...
   ```
   **Targets**
@@ -54,7 +45,7 @@ usage: |
   ```
 
 shields:
-  - https://img.shields.io/docker/pulls/marcelocorreia/base.svg
+  - https://img.shields.io/docker/pulls/marcelocorreia/base-node.svg
 
 tldr:
   - '[Overview](#overview)'

@@ -6,7 +6,7 @@ IMAGE_NAME := $(DOCKER_NAMESPACE)/$(NAME)
 GIT_REPO_NAME := docker-$(NAME)
 IMAGE_SOURCE_TYPE ?= .alpine
 REPO_URL := git@github.com:$(GITHUB_USER)/$(GIT_REPO_NAME).git
-
+SCAFOLD := badwolf
 GIT_BRANCH ?= master
 GIT_REMOTE ?= origin
 RELEASE_TYPE ?= patch
@@ -33,7 +33,7 @@ _setup-versions:
 _docker-build: _setup-versions
 	docker build -t $(IMAGE_NAME) -f Dockerfile$(IMAGE_SOURCE_TYPE)  .
 	docker build -t $(IMAGE_NAME):$(CURRENT_VERSION) -f Dockerfile$(IMAGE_SOURCE_TYPE) .
-	$(call  git_push,Post Release Updating auto generated stuff - version: $(CURRENT_VERSION))
+#	$(call  git_push,Post Release Updating auto generated stuff - version: $(CURRENT_VERSION))
 
 _docker-push: _setup-versions
 	docker push $(IMAGE_NAME):latest
@@ -45,6 +45,9 @@ _release: _setup-versions ;$(call  git_push,Releasing $(NEXT_VERSION)) ;$(info $
 
 _initial-release:
 	github-release release -u marcelocorreia -r $(GIT_REPO_NAME) --tag 0.0.0 --name 0.0.0
+
+_readme:
+	$(SCAFOLD) generate --resource-type readme .
 
 define git_push
 	-git add .
