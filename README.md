@@ -49,8 +49,17 @@ $ make next-version
 
 #### Dockerfile 
 ```Dockerfile
-ERROR including file: ./Dockerfile
+FROM node:alpine
 
+MAINTAINER marcelo correia <marcelo@correia.io>
+
+RUN apk update
+RUN set -ex && \
+    apk add --no-cache --update \
+        bash \
+        tzdata
+
+CMD ["node","-v"]
 ```
 
 <!-- Apache License -->

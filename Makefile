@@ -10,7 +10,8 @@ SCAFOLD := badwolf
 GIT_BRANCH ?= master
 GIT_REMOTE ?= origin
 RELEASE_TYPE ?= patch
-SEMVER_DOCKER ?= marcelocorreia/semver
+#SEMVER_DOCKER ?= marcelocorreia/semver
+VERSION_CMD := docker run marcelocorreia/base-node node -v | sed 's/v//g'
 
 release: _release
 build: _docker-build
@@ -26,25 +27,24 @@ next-version: _setup-versions
 	@echo $(NEXT_VERSION)
 
 _setup-versions:
-	$(eval export CURRENT_VERSION=$(shell git ls-remote --tags $(GIT_REMOTE) | grep -v latest | awk '{ print $$2}'|grep -v 'stable'| sort -r --version-sort | head -n1|sed 's/refs\/tags\///g'))
-	$(eval export NEXT_VERSION=$(shell docker run --rm --entrypoint=semver $(SEMVER_DOCKER) -c -i $(RELEASE_TYPE) $(CURRENT_VERSION)))
+	$(eval export VERSION=$(shell $(VERSION_CMD)))
+#	$(eval export CURRENT_VERSION=$(shell git ls-remote --tags $(GIT_REMOTE) | grep -v latest | awk '{ print $$2}'|grep -v 'stable'| sort -r --version-sort | head -n1|sed 's/refs\/tags\///g'))
+#	$(eval export NEXT_VERSION=$(shell docker run --rm --entrypoint=semver $(SEMVER_DOCKER) -c -i $(RELEASE_TYPE) $(CURRENT_VERSION)))
 
 
 _docker-build: _setup-versions
-	docker build -t $(IMAGE_NAME) -f Dockerfile$(IMAGE_SOURCE_TYPE)  .
-	docker build -t $(IMAGE_NAME):$(CURRENT_VERSION) -f Dockerfile$(IMAGE_SOURCE_TYPE) .
+	docker build -t $(IMAGE_NAME) .
+	docker build -t $(IMAGE_NAME):$(VERSION) .
 #	$(call  git_push,Post Release Updating auto generated stuff - version: $(CURRENT_VERSION))
 
 _docker-push: _setup-versions
 	docker push $(IMAGE_NAME):latest
-	docker push $(IMAGE_NAME):$(CURRENT_VERSION)
+	docker push $(IMAGE_NAME):$(VERSION)
 
-_release: _setup-versions ;$(call  git_push,Releasing $(NEXT_VERSION)) ;$(info $(M) Releasing version $(NEXT_VERSION)...)## Release by adding a new tag. RELEASE_TYPE is 'patch' by default, and can be set to 'minor' or 'major'.
-	github-release release -u marcelocorreia -r $(GIT_REPO_NAME) --tag $(NEXT_VERSION) --name $(NEXT_VERSION)
-	$(MAKE) _docker-build _docker-push
-
-_initial-release:
-	github-release release -u marcelocorreia -r $(GIT_REPO_NAME) --tag 0.0.0 --name 0.0.0
+_release: _setup-versions _readme ;$(call  git_push,Releasing $(NEXT_VERSION)) ;$(info $(M) Releasing version $(NEXT_VERSION)...)## Release by adding a new tag. RELEASE_TYPE is 'patch' by default, and can be set to 'minor' or 'major'.
+	$(MAKE) _docker-build
+	github-release release -u marcelocorreia -r $(GIT_REPO_NAME) --tag $(VERSION) --name $(VERSION)
+#	_docker-push
 
 _readme:
 	$(SCAFOLD) generate --resource-type readme .
