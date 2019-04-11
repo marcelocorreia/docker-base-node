@@ -32,19 +32,18 @@ _setup-versions:
 #	$(eval export NEXT_VERSION=$(shell docker run --rm --entrypoint=semver $(SEMVER_DOCKER) -c -i $(RELEASE_TYPE) $(CURRENT_VERSION)))
 
 
-_docker-build: _setup-versions
+_docker-build: _setup-versions _readme
 	docker build -t $(IMAGE_NAME) .
 	docker build -t $(IMAGE_NAME):$(VERSION) .
-#	$(call  git_push,Post Release Updating auto generated stuff - version: $(CURRENT_VERSION))
+	$(call  git_push,Post Release Updating auto generated stuff - version: $(CURRENT_VERSION))
 
 _docker-push: _setup-versions
 	docker push $(IMAGE_NAME):latest
 	docker push $(IMAGE_NAME):$(VERSION)
 
-_release: _setup-versions _readme ;$(call  git_push,Releasing $(NEXT_VERSION)) ;$(info $(M) Releasing version $(NEXT_VERSION)...)## Release by adding a new tag. RELEASE_TYPE is 'patch' by default, and can be set to 'minor' or 'major'.
-	$(MAKE) _docker-build
+_release: _setup-versions ;$(call  git_push,Releasing $(NEXT_VERSION)) ;$(info $(M) Releasing version $(NEXT_VERSION)...)## Release by adding a new tag. RELEASE_TYPE is 'patch' by default, and can be set to 'minor' or 'major'.
+	$(MAKE) _docker-build _docker-push
 	github-release release -u marcelocorreia -r $(GIT_REPO_NAME) --tag $(VERSION) --name $(VERSION)
-#	_docker-push
 
 _readme:
 	$(SCAFOLD) generate --resource-type readme .
