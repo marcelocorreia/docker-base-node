@@ -4,14 +4,13 @@ GITHUB_USER := marcelocorreia
 DOCKER_NAMESPACE := marcelocorreia
 IMAGE_NAME := $(DOCKER_NAMESPACE)/$(NAME)
 GIT_REPO_NAME := docker-$(NAME)
-IMAGE_SOURCE_TYPE ?= .alpine
 REPO_URL := git@github.com:$(GITHUB_USER)/$(GIT_REPO_NAME).git
 SCAFOLD := badwolf
 GIT_BRANCH ?= master
 GIT_REMOTE ?= origin
 RELEASE_TYPE ?= patch
 #SEMVER_DOCKER ?= marcelocorreia/semver
-VERSION_CMD := docker run marcelocorreia/base-node node -v | sed 's/v//g'
+VERSION_CMD := docker run --rm node:alpine node -v | sed 's/v//g'
 
 release: _release
 build: _docker-build
@@ -21,10 +20,7 @@ all-versions:
 	@git ls-remote --tags $(GIT_REMOTE)
 
 current-version: _setup-versions
-	@echo $(CURRENT_VERSION)
-
-next-version: _setup-versions
-	@echo $(NEXT_VERSION)
+	@echo $(VERSION)
 
 _setup-versions:
 	$(eval export VERSION=$(shell $(VERSION_CMD)))
