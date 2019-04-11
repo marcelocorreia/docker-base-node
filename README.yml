@@ -1,0 +1,68 @@
+---
+name: marcelocorreia/base-node
+github_user: marcelocorreia
+git_repo: docker-base-node
+docker_namespace: marcelocorreia
+docker: https://hub.docker.com/u/marcelocorreia
+github: https://github.com/marcelocorreia
+dockerfile: Dockerfile
+#logo: https://i2.wp.com/killscreen.com/wp-content/uploads/2016/08/bastion-gameplay.jpg?fit=700%2C396&ssl=1
+#docs: https://your.docs.com
+linkedin: https://www.linkedin.com/in/marcelocorreia/
+#website: https://your.website.com
+slack: https://correia-group.slack.com/
+#email: marcelo@correia.io
+blueprint: docker/image
+
+overview: |
+  Docker Base image
+
+dockerfiles:
+  - Dockerfile
+
+usage: |
+  ```bash
+  $ docker run --rm marcelocorreia/base:alpine bash
+  $ docker run --rm marcelocorreia/base:jessie-slim bash
+  $ docker run --rm marcelocorreia/base:buster-slim bash
+  ```
+  ## Setting timezone
+  ```bash
+  $ docker run --rm -e TZ=Australia/Sydney marcelocorreia/base bash
+  ```
+  ### Extending
+  ```Dockerfile
+  FROM marcelocorreia/base:alpine
+  ...
+  ```
+  ```Dockerfile
+  FROM marcelocorreia/base:jessie-slim
+  ...
+  ```
+  ```Dockerfile
+  FROM marcelocorreia/base:buster-slim
+  ...
+  ```
+  **Targets**
+  ```bash
+  $ make release
+  $ make build
+  $ make push
+  $ make all-versions
+  $ make current-version
+  $ make next-version
+  ```
+
+shields:
+  - https://img.shields.io/docker/pulls/marcelocorreia/base.svg
+
+tldr:
+  - '[Overview](#overview)'
+  - '[Description](#description)'
+  - '[Dockerfile](#dockefile)'
+  - '[Usage](#usage)'
+  - '[License](#license)'
+  - '**Semver versioning**'
+
+licenses:
+  - apache-license

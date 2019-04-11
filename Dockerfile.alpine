@@ -1,4 +1,4 @@
-FROM node:alpine
+FROM ruby:alpine
 
 MAINTAINER marcelo correia <marcelo@correia.io>
 
