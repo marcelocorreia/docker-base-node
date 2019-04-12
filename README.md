@@ -2,6 +2,7 @@
 # Docker marcelocorreia/base-node
 
 ---
+[![shield](https://img.shields.io/github/release/marcelocorreia/docker-base-node.svg?flat-square)](https://img.shields.io/github/release/marcelocorreia/docker-base-node.svg?flat-square)
 [![shield](https://img.shields.io/docker/pulls/marcelocorreia/base-node.svg)](https://img.shields.io/docker/pulls/marcelocorreia/base-node.svg)
 [![shield](https://img.shields.io/github/release/marcelocorreia/base-node.svg?flat-square)](https://img.shields.io/github/release/marcelocorreia/base-node.svg?flat-square)
 ---
