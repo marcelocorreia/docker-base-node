@@ -13,7 +13,7 @@ VERSION_CMD := docker run --rm node:alpine node -v | sed 's/v//g'
 
 open-page: _open-page
 release: _release
-build: _docker-build
+build: _docker-build _readme ;$(call  git_push,Updating docs...)
 push: _docker-push
 all-versions: _all-versions
 current-version: _current-version
@@ -32,17 +32,17 @@ _docker-build: _setup-versions _readme ;$(info $(M) Building $(NAME))
 	docker build -t $(IMAGE_NAME) .
 	docker build -t $(IMAGE_NAME):$(VERSION) .
 
-_docker-push: _setup-versions
+_docker-push: _docker-build
 	docker push $(IMAGE_NAME):latest
 	docker push $(IMAGE_NAME):$(CURRENT_VERSION)
 
 _release: _setup-versions ;$(call  git_push,Releasing $(NEXT_VERSION)) ;$(info $(M) Releasing version $(NEXT_VERSION)...)
+	$(MAKE) _docker-push
 	github-release release -u marcelocorreia -r $(GIT_REPO_NAME) --tag $(VERSION) --name $(VERSION)
-	$(MAKE) _docker-build _docker-push
+	$(call  git_push,Release: $(VERSION))
 
 _readme:
 	$(SCAFOLD) generate --resource-type readme .
-	$(call  git_push,Updating docs)
 
 _open-page:
 	open https://github.com/$(GITHUB_USER)/$(GIT_REPO_NAME).git
