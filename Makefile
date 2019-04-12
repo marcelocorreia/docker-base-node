@@ -9,7 +9,6 @@ REPO_URL := git@github.com:$(GITHUB_USER)/$(GIT_REPO_NAME).git
 SCAFOLD := badwolf
 GIT_BRANCH ?= master
 GIT_REMOTE ?= origin
-
 VERSION_CMD := docker run --rm node:alpine node -v | sed 's/v//g'
 
 open-page: _open-page
