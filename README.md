@@ -2,17 +2,16 @@
 # Docker marcelocorreia/base-node
 
 ---
-[![shield](https://img.shields.io/docker/pulls/marcelocorreia/base-node.svg?flat-square)](https://img.shields.io/docker/pulls/marcelocorreia/base-node.svg?flat-square)
+[![shield](https://img.shields.io/docker/pulls/marcelocorreia/base-node.svg)](https://img.shields.io/docker/pulls/marcelocorreia/base-node.svg)
 [![shield](https://img.shields.io/github/release/marcelocorreia/base-node.svg?flat-square)](https://img.shields.io/github/release/marcelocorreia/base-node.svg?flat-square)
 ---
 ### TLDR;
 - [Overview](#overview)
 - [Description](#description)
-- [Dockerfile](#dockefile)
+- [Dockerfile](#dockerfile)
 - [Usage](#usage)
 - [License](#license)
 - **Semver versioning**
-
 ### Overview
 Docker NodeJS Base image
 
@@ -46,9 +45,8 @@ $ make next-version
 
 
 
-## Dockerfiles
 
-#### Dockerfile 
+## Dockerfile 
 ```Dockerfile
 FROM node:alpine
 
@@ -101,8 +99,6 @@ Copyright [2015]
 
 
 [slack]: https://correia-group.slack.com/
-
-
 
 
 

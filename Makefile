@@ -24,9 +24,6 @@ current-version: _setup-versions
 
 _setup-versions:
 	$(eval export VERSION=$(shell $(VERSION_CMD)))
-#	$(eval export CURRENT_VERSION=$(shell git ls-remote --tags $(GIT_REMOTE) | grep -v latest | awk '{ print $$2}'|grep -v 'stable'| sort -r --version-sort | head -n1|sed 's/refs\/tags\///g'))
-#	$(eval export NEXT_VERSION=$(shell docker run --rm --entrypoint=semver $(SEMVER_DOCKER) -c -i $(RELEASE_TYPE) $(CURRENT_VERSION)))
-
 
 _docker-build: _setup-versions _readme
 	docker build -t $(IMAGE_NAME) .
@@ -43,6 +40,7 @@ _release: _setup-versions ;$(call  git_push,Releasing $(NEXT_VERSION)) ;$(info $
 
 _readme:
 	$(SCAFOLD) generate --resource-type readme .
+	$(call  git_push,Updating docs)
 
 define git_push
 	-git add .

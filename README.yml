@@ -45,12 +45,12 @@ usage: |
   ```
 
 shields:
-  - https://img.shields.io/docker/pulls/marcelocorreia/base-node.svg?flat-square
+  - https://img.shields.io/docker/pulls/{{.name}}.svg
   - https://img.shields.io/github/release/{{ .github_user }}/base-node.svg?flat-square
 tldr:
   - '[Overview](#overview)'
   - '[Description](#description)'
-  - '[Dockerfile](#dockefile)'
+  - '[Dockerfile](#dockerfile)'
   - '[Usage](#usage)'
   - '[License](#license)'
   - '**Semver versioning**'
