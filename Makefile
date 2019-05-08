@@ -13,9 +13,10 @@ RELEASE_TYPE ?= patch
 SEMVER_DOCKER ?= marcelocorreia/semver
 
 # Available Targets
-release: _release
-build: _docker-build
-push: _docker-push
+docker-release: _release
+docker-build: _docker-build
+docker-push: _docker-push
+
 all-versions:
 	@git ls-remote --tags $(GIT_REMOTE)
 current-version: _setup-versions
@@ -53,7 +54,8 @@ _new-repo:
 _initial-release: _new-repo
 	@github-release release -u $(GITHUB_USER) -r $(GIT_REPO_NAME) --tag 0.0.0 --name 0.0.0
 
-# Funcs
+
+
 define git_push
 	-git add .
 	-git commit -m "$1"
