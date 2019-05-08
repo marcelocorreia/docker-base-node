@@ -1,50 +1,57 @@
 NAME := $(shell basename $(shell pwd) | sed 's/docker-//g')
-M := $(shell printf "\033[34;1m▶\033[0m")
+#
 GITHUB_USER := marcelocorreia
 DOCKER_NAMESPACE := marcelocorreia
 IMAGE_NAME := $(DOCKER_NAMESPACE)/$(NAME)
-GIT_REPO_NAME := $(shell basename $(shell pwd))
-IMAGE_SOURCE_TYPE ?= .alpine
+GIT_REPO_NAME := docker-$(NAME)
+IMAGE_SOURCE_TYPES ?= jessie-slim buster-slim alpine
 REPO_URL := git@github.com:$(GITHUB_USER)/$(GIT_REPO_NAME).git
-SCAFOLD := badwolf
+
 GIT_BRANCH ?= master
 GIT_REMOTE ?= origin
-VERSION_CMD := docker run --rm node:alpine node -v | sed 's/v//g'
+RELEASE_TYPE ?= patch
+SEMVER_DOCKER ?= marcelocorreia/semver
 
-open-page: _open-page
+# Available Targets
 release: _release
-build: _docker-build _readme ;$(call  git_push,Updating docs...)
+build: _docker-build
 push: _docker-push
-all-versions: _all-versions
-current-version: _current-version
-info: ;$(info $(M) TODO)
-
-_all-versions:
+all-versions:
 	@git ls-remote --tags $(GIT_REMOTE)
+current-version: _setup-versions
+	@echo $(CURRENT_VERSION)
+next-version: _setup-versions
+	@echo $(NEXT_VERSION)
+git-push:
+	@$(call git_push,updating)
 
-_current-version: _setup-versions
-	@echo $(VERSION)
-
+# Internal targets
 _setup-versions:
-	$(eval export VERSION=$(shell $(VERSION_CMD)))
+	$(eval export CURRENT_VERSION=$(shell git ls-remote --tags $(GIT_REMOTE) | grep -v latest | awk '{ print $$2}'|grep -v 'stable'| sort -r --version-sort | head -n1|sed 's/refs\/tags\///g'))
+	$(eval export NEXT_VERSION=$(shell docker run --rm --entrypoint=semver $(SEMVER_DOCKER) -c -i $(RELEASE_TYPE) $(CURRENT_VERSION)))
 
-_docker-build: _setup-versions _readme ;$(info $(M) Building $(NAME))
-	docker build -t $(IMAGE_NAME) .
-	docker build -t $(IMAGE_NAME):$(VERSION) .
+_docker-build: _setup-versions
+	@$(foreach img,$(IMAGE_SOURCE_TYPES),docker build -t $(IMAGE_NAME):$(img) -f Dockerfile.$(img) .;)
+	@$(foreach img,$(IMAGE_SOURCE_TYPES),docker build -t $(IMAGE_NAME):$(img)-$(CURRENT_VERSION) -f Dockerfile.$(img) .;)
+	@docker build -t $(IMAGE_NAME):$(NAME) -f Dockerfile.alpine .
 
-_docker-push: _docker-build
-	docker push $(IMAGE_NAME):latest
-	docker push $(IMAGE_NAME):$(CURRENT_VERSION)
+_docker-push: _setup-versions
+	@$(foreach img,$(IMAGE_SOURCE_TYPES),docker push $(IMAGE_NAME):$(img)-$(CURRENT_VERSION);)
 
-_release: _setup-versions ;$(call  git_push,Releasing $(NEXT_VERSION)) ;$(info $(M) Releasing version $(NEXT_VERSION)...)
-	$(MAKE) _docker-push
-	github-release release -u marcelocorreia -r $(GIT_REPO_NAME) --tag $(VERSION) --name $(VERSION)
-	$(call  git_push,Release: $(VERSION))
+_release: _setup-versions ;$(call  git_push,Releasing $(NEXT_VERSION)) ;$(info $(M) Releasing version $(NEXT_VERSION)...)## Release by adding a new tag. RELEASE_TYPE is 'patch' by default, and can be set to 'minor' or 'major'.
+	@github-release release -u marcelocorreia -r $(GIT_REPO_NAME) --tag $(NEXT_VERSION) --name $(NEXT_VERSION)
+	@$(MAKE) _docker-build _docker-push
 
-_readme:
-	$(SCAFOLD) generate --resource-type readme .
+_new-repo:
+	@hub init
+	@hub create docker-$(NAME)
+	@hub add Makefile
+	@hub push
 
-_open-page:
+_initial-release: _new-repo
+	@github-release release -u marcelocorreia -r $(GIT_REPO_NAME) --tag 0.0.0 --name 0.0.0
+
+open-page:
 	open https://github.com/$(GITHUB_USER)/$(GIT_REPO_NAME).git
 
 define git_push
