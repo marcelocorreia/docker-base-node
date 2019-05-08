@@ -4,7 +4,7 @@ GITHUB_USER := marcelocorreia
 DOCKER_NAMESPACE := marcelocorreia
 IMAGE_NAME := $(DOCKER_NAMESPACE)/$(NAME)
 GIT_REPO_NAME := docker-$(NAME)
-IMAGE_SOURCE_TYPES ?= jessie-slim buster-slim alpine
+
 REPO_URL := git@github.com:$(GITHUB_USER)/$(GIT_REPO_NAME).git
 
 GIT_BRANCH ?= master
@@ -31,15 +31,15 @@ _setup-versions:
 	$(eval export NEXT_VERSION=$(shell docker run --rm --entrypoint=semver $(SEMVER_DOCKER) -c -i $(RELEASE_TYPE) $(CURRENT_VERSION)))
 
 _docker-build: _setup-versions
-	@$(foreach img,$(IMAGE_SOURCE_TYPES),docker build -t $(IMAGE_NAME):$(img) -f Dockerfile.$(img) .;)
-	@$(foreach img,$(IMAGE_SOURCE_TYPES),docker build -t $(IMAGE_NAME):$(img)-$(CURRENT_VERSION) -f Dockerfile.$(img) .;)
-	@docker build -t $(IMAGE_NAME):$(NAME) -f Dockerfile.alpine .
+	@docker build -t $(IMAGE_NAME):$(CURRENT_VERSION) -f Dockerfile .
+	@docker build -t $(IMAGE_NAME):latest -f Dockerfile .
 
 _docker-push: _setup-versions
-	@$(foreach img,$(IMAGE_SOURCE_TYPES),docker push $(IMAGE_NAME):$(img)-$(CURRENT_VERSION);)
+	docker push $(IMAGE_NAME):$(CURRENT_VERSION)
+	docker push $(IMAGE_NAME):latest
 
 _release: _setup-versions ;$(call  git_push,Releasing $(NEXT_VERSION)) ;$(info $(M) Releasing version $(NEXT_VERSION)...)## Release by adding a new tag. RELEASE_TYPE is 'patch' by default, and can be set to 'minor' or 'major'.
-	@github-release release -u marcelocorreia -r $(GIT_REPO_NAME) --tag $(NEXT_VERSION) --name $(NEXT_VERSION)
+	@github-release release -u $(GITHUB_USER) -r $(GIT_REPO_NAME) --tag $(NEXT_VERSION) --name $(NEXT_VERSION)
 	@$(MAKE) _docker-build _docker-push
 
 _new-repo:
@@ -49,7 +49,7 @@ _new-repo:
 	@hub push
 
 _initial-release: _new-repo
-	@github-release release -u marcelocorreia -r $(GIT_REPO_NAME) --tag 0.0.0 --name 0.0.0
+	@github-release release -u $(GITHUB_USER) -r $(GIT_REPO_NAME) --tag 0.0.0 --name 0.0.0
 
 open-page:
 	open https://github.com/$(GITHUB_USER)/$(GIT_REPO_NAME).git
