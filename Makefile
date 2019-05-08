@@ -24,6 +24,8 @@ next-version: _setup-versions
 	@echo $(NEXT_VERSION)
 git-push:
 	@$(call git_push,updating)
+open-page:
+	open https://github.com/$(GITHUB_USER)/$(GIT_REPO_NAME).git
 
 # Internal targets
 _setup-versions:
@@ -51,9 +53,7 @@ _new-repo:
 _initial-release: _new-repo
 	@github-release release -u $(GITHUB_USER) -r $(GIT_REPO_NAME) --tag 0.0.0 --name 0.0.0
 
-open-page:
-	open https://github.com/$(GITHUB_USER)/$(GIT_REPO_NAME).git
-
+# Funcs
 define git_push
 	-git add .
 	-git commit -m "$1"
